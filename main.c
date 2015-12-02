@@ -1,8 +1,8 @@
 /******************************************************************/
 /* main.c                                                         */
 /* Quentin MORIZOT                                                */
-/* Creation: 29/11/15                                             */
-/* Last modification: 30/11/15                                    */
+/* Creation: 02/12/15                                             */
+/* Last modification: 02/12/15                                    */
 /******************************************************************/
 
 #include "constant.h"
@@ -37,10 +37,19 @@ int main(int argc, char* argv[])
 
   /****************************************************************************************************/
   /* INITIALIZE VIDEO */
-  SDL_Init(SDL_INIT_VIDEO);
+  if (SDL_Init(SDL_INIT_VIDEO) == -1) {
+    fprintf(stderr,"Erreur lors de l'initialisation de la SDL\n");
+    return -1;
+  }
   putenv("SDL_VIDEO_WINDOW_POS=center");
   SDL_WM_SetCaption("Jeu de la vie", NULL);
+
   sprite.screen = SDL_SetVideoMode(x_screen, y_screen, 0, 0);
+  if (sprite.screen == NULL) {
+    fprintf(stderr,"Erreur lors de l'ouverture de la fenetre\n");
+    SDL_Quit();
+    return -2;
+  }
   sprite = load_sprite(sprite);
 
   while (!close) {

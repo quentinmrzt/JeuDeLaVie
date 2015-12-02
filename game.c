@@ -1,13 +1,12 @@
 /******************************************************************/
 /* game.c                                                         */
 /* Quentin MORIZOT                                                */
-/* Creation: 29/11/15                                             */
-/* Last modification: 30/11/15                                    */
+/* Creation: 02/12/15                                             */
+/* Last modification: 02/12/15                                    */
 /******************************************************************/
 
 #include "constant.h"
 #include "game.h"
-
 
 /****************************************************************************************************/
 /* INITIALIZE */
@@ -212,7 +211,8 @@ void choice_pattern(int x_max, int y_max, int tab_one[y_max][x_max], int tab_two
     line(x_max,y_max,tab_two,y_max/2);
   } else {
     printf("Chiffre invalide, initialise a 1.\n");
-    pattern = 1;
+    acorn(x_max,y_max,tab_one,x_max/2,y_max/2);
+    acorn(x_max,y_max,tab_two,x_max/2,y_max/2);
   } 
 }
 
