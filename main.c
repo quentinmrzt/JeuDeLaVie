@@ -12,9 +12,12 @@
 
 int main(int argc, char* argv[])
 {
-  int close, x_max, y_max, generation, size_cell, x_screen, y_screen, waiting;
+  int x_max, y_max, generation, size_cell, x_screen, y_screen, waiting;
   s_surface sprite;
   s_time time;
+  SDL_Event event;
+  Input in;
+
 
   /****************************************************************************************************/
   /* INITIALIZE VARIABLE */
@@ -32,35 +35,40 @@ int main(int argc, char* argv[])
 
   waiting = ask_waiting();
   time = ini_time(time);
-  close = 0;
   generation = 0;
+  memset(&in,0,sizeof(in)); // ini tout a 0
 
   /****************************************************************************************************/
   /* INITIALIZE VIDEO */
   if (SDL_Init(SDL_INIT_VIDEO) == -1) {
-    fprintf(stderr,"Erreur lors de l'initialisation de la SDL\n");
+    printf("Erreur lors de l'initialisation de la SDL\n");
     return -1;
   }
   putenv("SDL_VIDEO_WINDOW_POS=center");
   SDL_WM_SetCaption("Jeu de la vie", NULL);
 
-  sprite.screen = SDL_SetVideoMode(x_screen, y_screen, 0, 0);
+  sprite.screen = SDL_SetVideoMode(x_screen, y_screen, 0, SDL_DOUBLEBUF);
   if (sprite.screen == NULL) {
-    fprintf(stderr,"Erreur lors de l'ouverture de la fenetre\n");
+    printf("Erreur lors de l'ouverture de la fenetre\n");
     SDL_Quit();
     return -2;
   }
-  sprite = load_sprite(sprite);
+  sprite = load_sprite(sprite); // prevoir le cas == NULL
 
-  while (!close) {
+  while (!in.key[SDLK_ESCAPE] && !in.quit) {
     /****************************************************************************************************/
     /* TIME */
     time.current = SDL_GetTicks();
 
     /****************************************************************************************************/
     /* KEYBOARD AND MOUSE */
-    close = quit(close);
-
+    UpdateEvents(&in);
+    //printf("mouse pos:  x: %d  y: %d\n",in.mousex,in.mousey);
+    //printf("mouse rel:  x: %d  y: %d\n",in.mousexrel,in.mouseyrel);
+    if (in.mousebuttons[SDL_BUTTON_LEFT]) {
+      printf("CLICK\n");
+      in.mousebuttons[SDL_BUTTON_LEFT] = 0;
+    }
     /****************************************************************************************************/
     /* GAME */
     next_generation(x_max,y_max,tab_one,tab_two,&generation);
@@ -68,11 +76,12 @@ int main(int argc, char* argv[])
 
     /****************************************************************************************************/
     /* DRAW */
+    SDL_FillRect(sprite.screen, NULL, SDL_MapRGB(sprite.screen->format, 0, 0, 0)); // ecran noir
     draw(x_max,y_max,tab_one,sprite,size_cell);
 
     /****************************************************************************************************/
     /* OTHER */
-    SDL_UpdateRect(sprite.screen,0,0,0,0);
+    SDL_Flip(sprite.screen); 
     SDL_Delay(waiting);
   }
 

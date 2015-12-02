@@ -12,5 +12,6 @@
 /* KEYBOARD AND MOUSE */
 
 int quit(int close);
+void UpdateEvents(Input* in);
 
 #endif
