@@ -48,7 +48,11 @@ void ini_tab(int x_max, int y_max,int tab[y_max][x_max])
 
   for (y=0 ; y<y_max ; y++) {
     for (x=0 ; x<x_max ; x++) {
-      tab[y][x] = 0;
+      if (x == 0 || y == 0 || x == x_max-1 || y == y_max-1) {
+	tab[y][x] = 2;
+      } else { 
+	tab[y][x] = 0;
+      }
     }
   }
 }

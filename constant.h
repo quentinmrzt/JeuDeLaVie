@@ -36,6 +36,8 @@ typedef struct
   char key[SDLK_LAST];
   int mousex,mousey;
   int mousexrel,mouseyrel;
+  /* SDL_BUTTON_LEFT  SDL_BUTTON_MIDDLE  SDL_BUTTON_RIGHt  SDL_BUTTON_WHEELUP
+     SDL_BUTTON_WHEELDOWN  SDL_BUTTON_X1  SDL_BUTTON_X2 */
   char mousebuttons[8];
   char quit;
 } Input;

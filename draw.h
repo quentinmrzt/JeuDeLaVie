@@ -11,6 +11,6 @@
 /****************************************************************************************************/
 /* DRAW */
 
-void draw(int x_max, int y_max, int tab[y_max][x_max], s_surface sprite, int size_cell);
+void draw(int x_max, int y_max, int tab[y_max][x_max], s_surface sprite, int size_cell, SDL_Rect min, SDL_Rect max);
 
 #endif
