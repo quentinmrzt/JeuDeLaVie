@@ -45,6 +45,7 @@ s_time ini_time(s_time time)
 void ini_tab(int x_max, int y_max,int tab[y_max][x_max])
 {
   int x,y;
+  printf("2 - test\n");
 
   for (y=0 ; y<y_max ; y++) {
     for (x=0 ; x<x_max ; x++) {
@@ -234,6 +235,15 @@ int ask_waiting(void)
   return waiting;
 }
 
+int in_mouse(Input in, SDL_Rect min, SDL_Rect max)
+{
+  if (in.mousex >= min.x && in.mousex < max.x && in.mousey >= min.y && in.mousey < max.y) {
+    return 1;
+  }
+  return 0;
+}
+
+
 /****************************************************************************************************/
 /* PATTERNS */
 
@@ -314,4 +324,56 @@ void free_all_sprite(s_surface sprite)
   SDL_FreeSurface(sprite.black);
   SDL_FreeSurface(sprite.white);
   SDL_FreeSurface(sprite.green);
+}
+
+SDL_Rect ini_line_cursor(int x, int y, int w, int h) 
+{
+  SDL_Rect line;
+  line.w = w;
+  line.h = h;
+  line.x = x;
+  line.y = y;
+  return line;
+}
+
+SDL_Rect ini_button_cursor(SDL_Rect line, int w, int h) 
+{
+  SDL_Rect cursor;
+  cursor.w = 4;
+  cursor.h = 20;
+  cursor.x = line.x + line.w/2 - cursor.w/2;
+  cursor.y = line.y + line.h/2 - cursor.h/2;
+  return cursor;
+}
+
+int cross_product(SDL_Rect cursor,SDL_Rect line,int min,int max)
+{
+  int res;
+
+  res = ((cursor.x-line.x)*max)/line.w;
+  if (res < min) {
+    res = min;
+  }
+  if (res > max) {
+    res = max;
+  }
+
+  return res;
+}
+
+SDL_Rect move_cursor(Input in, SDL_Rect cursor, SDL_Rect line)
+{
+  if (in.mousex >= line.x-5 && in.mousex < line.x+line.w+5 && in.mousey >= cursor.y && in.mousey < cursor.y+cursor.h) {
+    if (in.mousebuttons[SDL_BUTTON_LEFT]) {
+      cursor.x = in.mousex-cursor.w/2;
+      if (cursor.x < line.x) {
+	cursor.x = line.x;
+      }
+      if (cursor.x > line.x+line.w) {
+	cursor.x = line.x+line.w;
+      }
+    }
+  }
+
+  return cursor;
 }

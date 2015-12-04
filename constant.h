@@ -13,6 +13,7 @@
 #include <time.h>
 #include <math.h>
 #include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 
 struct s_surface
 {

@@ -12,46 +12,85 @@
 
 int main(int argc, char* argv[])
 {
-  int x_max, y_max, generation, size_cell, x_screen, y_screen, waiting;
+  int x_screen, y_screen, x_max, y_max, generation, size_cell, waiting;
   s_surface sprite;
-  s_time time;
-  SDL_Event event;
   Input in;
-  SDL_Rect min, max;
+  SDL_Rect min, max, resolution, cursor, line;
+  TTF_Font *font = NULL;
+  s_time time;
 
-  /****************************************************************************************************/
-  /* INITIALIZE VARIABLE */
-  size_cell = 1;
-  x_screen = (ask_x()/size_cell)*size_cell;
-  y_screen = (ask_y()/size_cell)*size_cell;
 
-  x_max = x_screen/size_cell;
-  y_max = y_screen/size_cell;
-
-  max.x = x_max;
-  max.y = y_max;
-  min.x = 0;
-  min.y = 0;
-
-  int tab_one[y_max][x_max];
-  int tab_two[y_max][x_max];
-  ini_tab(x_max,y_max,tab_one);
-  ini_tab(x_max,y_max,tab_two);
-  choice_pattern(x_max,y_max,tab_one,tab_two,ask_pattern());
-
-  waiting = ask_waiting();
-  time = ini_time(time);
-  generation = 0;
-  memset(&in,0,sizeof(in)); // ini tout a 0
-
-  /****************************************************************************************************/
-  /* INITIALIZE VIDEO */
+  /* INITIALIZE SDL*/
   if (SDL_Init(SDL_INIT_VIDEO) == -1) {
     printf("Erreur lors de l'initialisation de la SDL\n");
     return -1;
   }
+  TTF_Init();
   putenv("SDL_VIDEO_WINDOW_POS=center");
+  SDL_WM_SetCaption("Parametre", NULL);
+
+  /* INITIALIZE VARIABLE */
+  resolution.x = SDL_GetVideoInfo()->current_w;
+  resolution.y = SDL_GetVideoInfo()->current_h;
+  x_screen = 500;
+  y_screen = 300;
+  memset(&in,0,sizeof(in)); // in = 0
+  font = TTF_OpenFont("pixelmix.ttf", 10);
+
+  sprite.screen = SDL_SetVideoMode(x_screen, y_screen, 0, SDL_DOUBLEBUF);
+  if (sprite.screen == NULL) {
+    printf("Erreur lors de l'ouverture de la fenetre\n");
+    SDL_Quit();
+    return -2;
+  }
+  sprite = load_sprite(sprite); // prevoir le cas == NULL
+  line = ini_line_cursor(150,80,150,18); 
+  cursor = ini_button_cursor(line,4,20);
+
+
+
+  while (!in.key[SDLK_ESCAPE] && !in.quit) {
+    UpdateEvents(&in);
+    /*** ACTION ***/
+    cursor = move_cursor(in,cursor,line);
+    x_screen = cross_product(cursor,line,1,resolution.x);
+    /*** DRAW ***/
+    SDL_FillRect(sprite.screen, NULL, SDL_MapRGB(sprite.screen->format, 0, 0, 0));
+    draw_text_cursor(sprite,x_screen,line,cursor,1,resolution.x);
+    draw_line_cursor(sprite,line);
+    draw_button_cursor(sprite,cursor);
+    SDL_Flip(sprite.screen);
+    /*** OTHER ***/
+    SDL_Delay(33);
+  }
+  free_all_sprite(sprite);
+
+
+
+
   SDL_WM_SetCaption("Jeu de la vie", NULL);
+  size_cell = 1;
+  //x_screen = (ask_x()/size_cell)*size_cell;
+  //y_screen = (ask_y()/size_cell)*size_cell;
+  x_screen = 1000;
+  y_screen = 600;
+  x_max = x_screen/size_cell;
+  y_max = y_screen/size_cell;
+  max.x = x_max;
+  max.y = y_max;
+  min.x = 0;
+  min.y = 0;
+  int tab_one[y_max][x_max];
+  int tab_two[y_max][x_max];
+  ini_tab(x_max,y_max,tab_one);
+  ini_tab(x_max,y_max,tab_two);
+  //choice_pattern(x_max,y_max,tab_one,tab_two,ask_pattern());
+  choice_pattern(x_max,y_max,tab_one,tab_two,3);
+  //waiting = ask_waiting();
+  waiting = 0;
+  time = ini_time(time);
+  generation = 0;
+  memset(&in,0,sizeof(in)); // ini tout a 0
 
   sprite.screen = SDL_SetVideoMode(x_screen, y_screen, 0, SDL_DOUBLEBUF);
   if (sprite.screen == NULL) {
@@ -61,6 +100,12 @@ int main(int argc, char* argv[])
   }
   sprite = load_sprite(sprite); // prevoir le cas == NULL
 
+
+
+
+
+
+  /**********  JEU DE LA VIE  **********/
   while (!in.key[SDLK_ESCAPE] && !in.quit) {
     /****************************************************************************************************/
     /* TIME */
@@ -134,7 +179,7 @@ int main(int argc, char* argv[])
       }
     }
 
-    /***** MOUVE *****/
+    /***** MOVE *****/
     if (in.key[SDLK_UP]) {
       max.y--;
       min.y--;
@@ -192,6 +237,8 @@ int main(int argc, char* argv[])
   /****************************************************************************************************/
   /* CLEAN */
   free_all_sprite(sprite);
+  TTF_CloseFont(font);
+  TTF_Quit();
   SDL_Quit();
 
   return 0;
